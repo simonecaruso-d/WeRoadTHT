@@ -6,7 +6,7 @@ ProjectRoot = Path(__file__).parent.parent.parent
 InputPath   = ProjectRoot / 'data' / 'BCWeeklyDataMarketing.xlsx'
 
 # Personal Inputs
-Percentages = {'facebook': 0.25, 'instagram': 0.18, 'tiktok': 0.12, 'criteo': 0.08, 'ppc': 0.22, 'google': 0.10, 'wordofmouth': 0.03, 'other': 0.02}
+Percentages = {'facebook': 0.14, 'instagram': 0.21, 'tiktok': 0.04, 'criteo': 0.02, 'ppc': 0.03, 'google': 0.12, 'wordofmouth': 0.4, 'other': 0.04}
 LagsInWeeks =[1, 2, 4, 8, 12, 16]
 
 # URLs
