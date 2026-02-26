@@ -1,13 +1,13 @@
 # Environment Setting
+import numpy as np
 import pandas as pd
 
-# Load
+# Functions | Data Loading
 def LoadData(inputFilePath):    
     df = pd.read_excel(inputFilePath, sheet_name='weekly overview')
 
     return df
 
-# Unpivot
 def UnpivotData(df, percentages):
     rows = []
     
@@ -61,51 +61,13 @@ def UnpivotData(df, percentages):
                             'Impressions': row['Facebook Imp.'] + row['Instagram Imp.'] + row['TikTok imp.'] + row['Criteo imp.'],
                             'Buyers'      : row['1st Time Buyer']}}
         
-        for channelName, metrics in channels.items():rows.append({'Date'       : date,
-                                                                  'Channel'    : channelName,
-                                                                  'Cost'       : metrics['Cost'],
-                                                                  'Click'      : metrics['Click'],
-                                                                  'Impressions': metrics['Impressions'],
-                                                                  'Buyers'     : metrics['Buyers']})
+        for channelName, metrics in channels.items():rows.append({'Date': date, 'Channel': channelName, 'Cost': metrics['Cost'], 'Click': metrics['Click'], 'Impressions': metrics['Impressions'], 'Buyers': metrics['Buyers']})
     
     return pd.DataFrame(rows)
 
-# Enrich
-def AddCAC(df):
-    df = df.sort_values(['Channel', 'Date']).reset_index(drop=True)
-    
-    df['RunningCost']   = df.groupby('Channel')['Cost'].transform(lambda x: x.fillna(0).cumsum())
-    df['RunningBuyers'] = df.groupby('Channel')['Buyers'].transform(lambda x: x.cumsum())
-    df['CAC']           = df.apply(lambda row: row['RunningCost'] / row['RunningBuyers'], axis=1)
-    
-    return df.drop(['RunningCost', 'RunningBuyers'], axis=1)
-
-def AddPromo(originalDf, unpivotedDf):
-    unpivotedDf          = unpivotedDf.merge(originalDf[['Monday', 'note']], left_on='Date', right_on='Monday', how='left').drop('Monday', axis=1)
-    
-    unpivotedDf['Promo'] = unpivotedDf['note'].fillna('').str.strip()
-    unpivotedDf['Promo'] = unpivotedDf['Promo'].replace('', None) 
-    
-    return unpivotedDf.drop('note', axis=1)
-
-def AddTicketPreSales(originalDf, unpivotedDf):
-    unpivotedDf                   = unpivotedDf.merge(originalDf[['Monday', 'Ticket Pre-sales']], left_on='Date', right_on='Monday', how='left').drop('Monday', axis=1)
-    
-    meanTickets                   = originalDf['Ticket Pre-sales'].mean()
-    stdTickets                    = originalDf['Ticket Pre-sales'].std()
-    threshold                     = meanTickets + stdTickets
-    unpivotedDf['TicketPeakFlag'] = (unpivotedDf['Ticket Pre-sales'] > threshold).astype(int)
-    
-    return unpivotedDf.drop('Ticket Pre-sales', axis=1)
-
-def AddTimeIntelligence(df):
-    df['Year']      = df['Date'].dt.year
-    df['Season']    = df['Date'].dt.month.apply(lambda x: 'Winter' if x in [12, 1, 2] else ('Spring' if x in [3, 4, 5] else ('Summer' if x in [6, 7, 8] else 'Autumn')))
-    df['Quarter']   = df['Date'].dt.quarter
-    df['Month']     = df['Date'].dt.month
-    df['Week']      = df['Date'].dt.isocalendar().week
-    df['DayOfWeek'] = df['Date'].dt.day_name()
-
+# Functions | Data Cleaning
+def DropDuplicates(df):
+    df = df.drop_duplicates()
     return df
 
 def RoundNumericColumns(df):
@@ -113,9 +75,15 @@ def RoundNumericColumns(df):
         if pd.api.types.is_numeric_dtype(df[col]): df[col] = df[col].round(2)
     return df
 
-# Lagged Features
-def AddLaggedCost(df, lags):
-    df = df.sort_values(['Channel', 'Date']).reset_index(drop=True)
-    
-    for lag in lags: df[f'CostLag{lag}'] = df.groupby('Channel')['Cost'].shift(lag)
-    return df
+# Functions | Data Engineering
+def AddTimeIntelligence(df):
+    df['Season']    = df['Date'].dt.month.apply(lambda x: 'Winter' if x in [12, 1, 2] else ('Spring' if x in [3, 4, 5] else ('Summer' if x in [6, 7, 8] else 'Autumn')))
+    df['Month']     = df['Date'].dt.month
+    df['Week']      = df['Date'].dt.isocalendar().week
+    df['MonthSin']  = np.sin(2 * np.pi * df['Month'] / 12)
+    df['MonthCos']  = np.cos(2 * np.pi * df['Month'] / 12)
+    df['WeekSin']   = np.sin(2 * np.pi * df['Week'] / 52)
+    df['WeekCos']   = np.cos(2 * np.pi * df['Week'] / 52)
+    df['DayOfWeek'] = df['Date'].dt.dayofweek
+
+    return df.drop(['Month', 'Week'], axis=1)
