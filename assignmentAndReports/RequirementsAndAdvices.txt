@@ -1,7 +1,0 @@
-BASE REQUIREMENTS
-- English
-- Deadline is on 03/03
-
-ADVICES
-- We value the thought process and explanation clarity above all
-- If you're going to leverage LLMs for this task, no problem: do it in a smart way
