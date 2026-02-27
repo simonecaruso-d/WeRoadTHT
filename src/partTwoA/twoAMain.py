@@ -1,7 +1,4 @@
 import pandas as pd
-import numpy as np
-from prophet import Prophet
-from sklearn.metrics import mean_absolute_percentage_error
 import tabulate
 
 import twoADataPreparation as DataLoading
