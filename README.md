@@ -6,13 +6,14 @@ Done as a Take Home Assignment for the application as Senior Analytics Engineer 
 
 ## 🎯 Project Structure
 ### **Part One: Causal Attribution Analysis**
-*Identifyingtrue  causal relationships between marketing spend and business outcomes*
-**Location:** `src/partOne/`
+*Identifying true causal relationships between marketing spend and business outcomes*
+
+**Report:** [`src/partOne/`](https://github.com/simonecaruso-d/WeRoadTHT/blob/main/src/partOne/oneReport.docx)
 
 ### **Part Two A: Predictive Time Series Forecasting**
 *Building robust forecasts for session-level performance using Prophet*
-**Location:** `src/partTwoA/`
+**Report:** [`src/partTwoA/`](https://github.com/simonecaruso-d/WeRoadTHT/blob/main/src/partTwoA/twoAReport.docx)
 
 ### **Part Two B & Three: Additional Strategic Analysis**
 *Deeper insights into marketing performance and optimization opportunities*
-**Location:** `src/partTwoB/`, `src/partThree/`
+**Report:** `src/partTwoB/`, `src/partThree/`
